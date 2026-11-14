@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Générateur de Contrat de Travail - Transport Routier</title>
+ <script src="https://cdn.tailwindcss.com"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+ <style>
+ body {
+ font-family: 'Inter', sans-serif;
+ background-color: #f3f4f6;
+ }
+ .contract-font {
+ font-family: 'Merriweather', Georgia, serif;
+ }
+ /* Format A4 */
+ .a4-container {
+ width: 210mm;
+ min-height: 297mm;
+ background: white;
+ box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+ margin: 0 auto;
+ padding: 18mm 20mm;
+ box-sizing: border-box;
+ color: #111827;
+ line-height: 1.55;
+ font-size: 10.5pt;
+ }
+ .avoid-break {
+ page-break-inside: avoid;
+ break-inside: avoid;
+ }
+ @media screen and (max-width: 1024px) {
+ .a4-wrapper {
+ overflow-x: auto;
+ padding-bottom: 2rem;
+ }
+ .a4-container {
+ width: 210mm;
+ transform-origin: top left;
+ }
+ }
+ /* Custom scrollbar */
+ ::-webkit-scrollbar {
+ width: 6px;
+ height: 6px;
+ }
+ ::-webkit-scrollbar-track {
+ background: #f1f1f1;
+ }
+ ::-webkit-scrollbar-thumb {
+ background: #cbd5e1;
+ border-radius: 3px;
+ }
+ ::-webkit-scrollbar-thumb:hover {
+ background: #94a3b8;
+ }
+ </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+ <!-- Top Navbar -->
+ <header class="bg-slate-900 text-white px-4 py-3 flex flex-wrap items-center justify-between shadow-md z-20 shrink-0 gap-2">
+ <div class="flex items-center gap-2.5">
+ <div class="bg-blue-600 p-2 rounded-lg">
+ <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+ </svg>
+ </div>
+ <div>
+ <h1 class="font-bold text-base sm:text-lg leading-tight">Générateur de Contrat de Travail</h1>
+ <p class="text-xs text-slate-400">Convention Collective Transport Routier</p>
+ </div>
+ </div>
+
+ <!-- Mobile View Switcher -->
+ <div class="flex lg:hidden bg-slate-800 p-1 rounded-lg text-xs font-medium">
+ <button id="btnTabForm" onclick="switchTab('form')" class="px-3 py-1.5 rounded-md bg-blue-600 text-white transition">Formulaire</button>
+ <button id="btnTabPreview" onclick="switchTab('preview')" class="px-3 py-1.5 rounded-md text-slate-300 hover:text-white transition">Aperçu PDF</button>
+ </div>
+
+ <div class="flex items-center gap-2">
+ <button onclick="fillExample()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs sm:text-sm font-medium rounded-lg transition flex items-center gap-1.5">
+ <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+ <span>Exemple</span>
+ </button>
+ <button onclick="resetForm()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-lg border border-slate-700 transition">
+ Réinitialiser
+ </button>
+ <button id="btnDownload" onclick="downloadPDF()" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-semibold rounded-lg shadow transition flex items-center gap-1.5">
+ <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+ <span>Télécharger PDF</span>
+ </button>
+ </div>
+ </header>
+
+ <!-- Main Content -->
+ <main class="flex-1 flex overflow-hidden">
+ 
+<!-- Left Column: Form -->
+ <section id="formPanel" class="w-full lg:w-[460px] xl:w-[500px] bg-white border-r border-slate-200 overflow-y-auto p-5 space-y-6 shrink-0">
+ 
+<!-- 1. Nature du contrat -->
+ <div class="space-y-3">
+ <h2 class="text-sm font-bold uppercase tracking-wider text-blue-600 flex items-center gap-2 border-b border-slate-100 pb-2">
+ <span class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs">1</span>
+ Nature du Contrat
+ </h2>
+ <div class="grid grid-cols-2 gap-3">
+ <label class="cursor-pointer">
+ <input type="radio" name="contractType" value="CDI" checked onchange="toggleContractType()" class="peer sr-only">
+ <div class="p-3 text-center rounded-lg border-2 border-slate-200 peer-checked:border-blue-600 peer-checked:bg-blue-50 font-semibold text-sm text-slate-700 peer-checked:text-blue-700 transition">
+ CDI (Durée Indéterminée)
+ </div>
+ </label>
+ <label class="cursor-pointer">
+ <input type="radio" name="contractType" value="CDD" onchange="toggleContractType()" class="peer sr-only">
+ <div class="p-3 text-center rounded-lg border-2 border-slate-200 peer-checked:border-blue-600 peer-checked:bg-blue-50 font-semibold text-sm text-slate-700 peer-checked:text-blue-700 transition">
+ CDD (Durée Déterminée)
+ </div>
+ </label>
+ </div>
+
+ <!-- CDD Specific Fields -->
+ <div id="cddFields" class="hidden space-y-3 bg-amber-50/70 p-3.5 rounded-lg border border-amber-200">
+ <div>
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Motif du recours au CDD</label>
+ <select id="cddMotif" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+ <option value="Accroissement temporaire d'activité de l'entreprise">Accroissement temporaire d'activité</option>
+ <option value="Remplacement d'un salarié absent">Remplacement d'un salarié absent</option>
+ <option value="Emploi à caractère saisonnier">Emploi à caractère saisonnier</option>
+ <option value="Attente de l'entrée en service effective d'un salarié recruté en CDI">Attente d'entrée en service d'un CDI</option>
+ </select>
+ </div>
+ <div class="grid grid-cols-2 gap-3">
+ <div>
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Date de fin du CDD</label>
+ <input type="date" id="cddEndDate" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+ </div>
+ <div>
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Durée minimale (optionnel)</label>
+ <input type="text" id="cddMinDuration" placeholder="Ex: 1 mois" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <!-- 2. Employeur & SIRET Auto-fill -->
+ <div class="space-y-3">
+ <h2 class="text-sm font-bold uppercase tracking-wider text-blue-600 flex items-center gap-2 border-b border-slate-100 pb-2">
+ <span class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs">2</span>
+ L'Employeur (Recherche SIRET)
+ </h2>
+ 
+ <!-- SIRET Instant Search box -->
+ <div class="bg-blue-50 p-3.5 rounded-lg border border-blue-200 space-y-2">
+ <label class="block text-xs font-bold text-blue-900">Entrez le N° SIRET en premier (Remplissage automatique)</label>
+ <div class="flex gap-2">
+ <input type="text" id="empSiret" placeholder="Ex: 84291034500021" oninput="updatePreview()" class="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white font-mono">
+ <button type="button" onclick="fetchCompanyBySiret()" id="btnSiretSearch" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg transition shadow-sm flex items-center gap-1">
+ <span>Rechercher</span>
+ </button>
+ </div>
+ <p id="siretStatus" class="text-[11px] text-slate-500 italic">Renseignez les 14 chiffres pour importer les données officielles (Pappers / Annuaire des Entreprises).</p>
+ </div>
+
+ <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+ <div class="sm:col-span-2">
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Raison sociale de l'entreprise</label>
+ <input type="text" id="empName" placeholder="Ex: TRANSPORTS EXPRESS SARL" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+ </div>
+ <div>
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Forme juridique</label>
+ <input type="text" id="empLegalForm" placeholder="Ex: SAS, SARL" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+ </div>
+ <div class="sm:col-span-2">
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Adresse du siège social</label>
+ <input type="text" id="empAddress" placeholder="Ex: 12 Rue de l'Industrie, 69000 Lyon" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+ </div>
+ <div>
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Représenté par (Nom & Prénom)</label>
+ <input type="text" id="empRepName" placeholder="Ex: M. Jean DUPONT" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+ </div>
+ <div>
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Qualité du représentant</label>
+ <input type="text" id="empRepRole" placeholder="Ex: Président / Gérant" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+ </div>
+ <div class="sm:col-span-2">
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Organisme URSSAF de rattachement</label>
+ <input type="text" id="empUrssaf" placeholder="Ex: URSSAF Rhône-Alpes" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+ </div>
+ </div>
+ </div>
+
+ <!-- 3. Salarié -->
+ <div class="space-y-3">
+ <h2 class="text-sm font-bold uppercase tracking-wider text-blue-600 flex items-center gap-2 border-b border-slate-100 pb-2">
+ <span class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs">3</span>
+ Le Salarié
+ </h2>
+ <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+ <div>
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Civilité</label>
+ <select id="salCivility" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white">
+ <option value="Monsieur">Monsieur</option>
+ <option value="Madame">Madame</option>
+ </select>
+ </div>
+ <div>
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Nom</label>
+ <input type="text" id="salLastName" placeholder="Ex: MARTIN" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+ </div>
+ <div>
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Prénom</label>
+ <input type="text" id="salFirstName" placeholder="Ex: Lucas" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+ </div>
+ <div>
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Date de naissance</label>
+ <input type="date" id="salBirthDate" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+ </div>
+ <div>
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Lieu de naissance</label>
+ <input type="text" id="salBirthPlace" placeholder="Ex: Paris (75)" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+ </div>
+ <div>
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Nationalité</label>
+ <input type="text" id="salNationality" placeholder="Ex: Française" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+ </div>
+ <div class="sm:col-span-3">
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Adresse complète du salarié</label>
+ <input type="text" id="salAddress" placeholder="Ex: 45 Avenue Jean Jaurès, 69007 Lyon" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+ </div>
+ <div class="sm:col-span-3">
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Numéro de Sécurité Sociale</label>
+ <input type="text" id="salSsn" placeholder="Ex: 1 90 05 75 123 456 78" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+ </div>
+ </div>
+
+ <!-- Salarié étranger / Titre de séjour -->
+ <div class="pt-1">
+ <label class="flex items-start gap-2.5 p-3 rounded-lg border border-slate-200 bg-slate-50 cursor-pointer hover:bg-slate-100 transition">
+ <input type="checkbox" id="isForeigner" onchange="toggleForeigner()" class="mt-0.5 w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
+ <div>
+ <span class="block text-xs font-bold text-slate-800">Le salarié est de nationalité étrangère (hors UE/EEE)</span>
+ <span class="block text-[11px] text-slate-500">Ajoute automatiquement les informations du titre de séjour et la clause de validité sous peine de licenciement.</span>
+ </div>
+ </label>
+
+ <div id="foreignerFields" class="hidden mt-3 space-y-3 bg-blue-50/70 p-3.5 rounded-lg border border-blue-200">
+ <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+ <div>
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Type de titre de séjour</label>
+ <input type="text" id="permitType" placeholder="Ex: Carte de séjour pluriannuelle" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white">
+ </div>
+ <div>
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Numéro du titre</label>
+ <input type="text" id="permitNumber" placeholder="Ex: 9912345678" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white">
+ </div>
+ <div class="sm:col-span-2">
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Date de fin de validité du titre</label>
+ <input type="date" id="permitExpiry" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white">
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <!-- 4. Poste, Classification & Temps de travail -->
+ <div class="space-y-3">
+ <h2 class="text-sm font-bold uppercase tracking-wider text-blue-600 flex items-center gap-2 border-b border-slate-100 pb-2">
+ <span class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs">4</span>
+ Poste, Classification & Horaires
+ </h2>
+ <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+ <div>
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Titre du poste</label>
+ <input type="text" id="jobTitle" placeholder="Ex: Conducteur Poids Lourds" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+ </div>
+ <div>
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Classification</label>
+ <input type="text" id="jobClassification" placeholder="Ex: Ouvrier - Groupe 6 - Coef. 138M" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+ </div>
+ <div>
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Date d'embauche (début)</label>
+ <input type="date" id="startDate" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+ </div>
+ <div>
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Période d'essai</label>
+ <input type="text" id="probationPeriod" placeholder="Ex: 2 mois renouvelable" value="2 mois" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+ </div>
+ <div class="sm:col-span-2">
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Lieu de rattachement / travail</label>
+ <input type="text" id="workLocation" placeholder="Ex: Dépôt de Lyon et déplacements nationaux" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+ </div>
+ <div class="sm:col-span-2">
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Convention collective applicable</label>
+ <input type="text" id="collectiveAgreement" value="Convention collective nationale des transports routiers et activités auxiliaires du transport" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500">
+ </div>
+ <div>
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Heures hebdomadaires</label>
+ <div class="relative">
+ <input type="number" step="0.01" id="weeklyHours" value="35" oninput="syncMonthlyHours()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 pr-10">
+ <span class="absolute right-3 top-2 text-xs text-slate-400">h/sem</span>
+ </div>
+ </div>
+ <div>
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Heures mensuelles</label>
+ <div class="relative">
+ <input type="number" step="0.01" id="monthlyHours" value="151.67" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 pr-12">
+ <span class="absolute right-3 top-2 text-xs text-slate-400">h/mois</span>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <!-- 5. Rémunération -->
+ <div class="space-y-3">
+ <h2 class="text-sm font-bold uppercase tracking-wider text-blue-600 flex items-center gap-2 border-b border-slate-100 pb-2">
+ <span class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs">5</span>
+ Rémunération
+ </h2>
+ <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+ <div>
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Rémunération brute mensuelle (€)</label>
+ <input type="number" step="0.01" id="monthlySalary" placeholder="Ex: 2300.00" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+ </div>
+ <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200 flex flex-col justify-center">
+ <span class="text-[11px] text-slate-500">Équivalents indicatifs :</span>
+ <span id="salaryIndicators" class="text-xs font-semibold text-slate-700 mt-0.5">— €/h | — €/an</span>
+ </div>
+ <div class="sm:col-span-2">
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Primes ou avantages (optionnel)</label>
+ <input type="text" id="bonuses" placeholder="Ex: Indemnités de frais de déplacement selon barème conventionnel" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+ </div>
+ </div>
+ </div>
+
+ <!-- 6. Signature -->
+ <div class="space-y-3 pb-6">
+ <h2 class="text-sm font-bold uppercase tracking-wider text-blue-600 flex items-center gap-2 border-b border-slate-100 pb-2">
+ <span class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs">6</span>
+ Signature
+ </h2>
+ <div class="grid grid-cols-2 gap-3">
+ <div>
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Fait à (Ville)</label>
+ <input type="text" id="signCity" placeholder="Ex: Lyon" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+ </div>
+ <div>
+ <label class="block text-xs font-semibold text-slate-700 mb-1">Date de signature</label>
+ <input type="date" id="signDate" oninput="updatePreview()" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+ </div>
+ </div>
+ </div>
+
+ </section>
+
+ <!-- Right Column: Live A4 Preview -->
+ <section id="previewPanel" class="hidden lg:block flex-1 bg-slate-200/80 overflow-y-auto p-4 sm:p-8 a4-wrapper">
+ <div id="contractDocument" class="a4-container contract-font">
+ 
+<!-- Header Title -->
+ <div class="text-center border-b-2 border-slate-900 pb-4 mb-6">
+ <h1 id="prevTitle" class="text-lg font-bold uppercase tracking-wide text-slate-900">
+ CONTRAT DE TRAVAIL À DURÉE INDÉTERMINÉE
+ </h1>
+ <p id="prevSubtitle" class="text-xs italic text-slate-600 mt-1">
+ Soumis aux dispositions du Code du travail et de la Convention collective nationale des transports routiers et activités auxiliaires du transport
+ </p>
+ </div>
+
+ <!-- Parties -->
+ <div class="space-y-4 mb-6 text-justify">
+ <p class="font-bold uppercase text-xs tracking-wider text-slate-700">ENTRE LES SOUSSIGNÉS :</p>
+ 
+<div class="pl-3 border-l-2 border-slate-300">
+ <p>
+ La société <strong id="prevEmpName">[Raison sociale]</strong>, <span id="prevEmpLegalForm">[Forme juridique]</span>, au numéro SIRET <strong id="prevEmpSiret">[SIRET]</strong>, dont le siège social est situé au <span id="prevEmpAddress">[Adresse siège social]</span>, représentée par <strong id="prevEmpRepName">[Représentant]</strong> en sa qualité de <span id="prevEmpRepRole">[Qualité]</span>.
+ </p>
+ <p class="text-xs text-slate-600 mt-1">
+ Cotisant auprès de : <span id="prevEmpUrssaf">[Organisme URSSAF]</span>.
+ </p>
+ <p class="italic text-right text-xs mt-1">Ci-après dénommée « l'Employeur », d'une part,</p>
+ </div>
+
+ <p class="font-bold uppercase text-xs tracking-wider text-slate-700">ET :</p>
+
+ <div class="pl-3 border-l-2 border-slate-300">
+ <p>
+ <strong id="prevSalCivility">Monsieur</strong> <strong id="prevSalFullName">[PRÉNOM NOM]</strong>, né(e) le <span id="prevSalBirthDate">[Date]</span> à <span id="prevSalBirthPlace">[Lieu]</span>, de nationalité <span id="prevSalNationality">[Nationalité]</span>, demeurant au <span id="prevSalAddress">[Adresse du salarié]</span>.
+ </p>
+ <p class="text-xs text-slate-600 mt-1">
+ N° de Sécurité Sociale : <strong id="prevSalSsn">[N° Sécurité Sociale]</strong>
+ </p>
+ <p id="prevForeignerInfo" class="hidden text-xs text-slate-800 mt-1 bg-slate-50 p-1.5 border border-slate-200">
+ Titulaire d'un titre de séjour (<span id="prevPermitType">Titre</span>) n° <strong id="prevPermitNumber">[Numéro]</strong> valable jusqu'au <strong id="prevPermitExpiry">[Date]</strong>.
+ </p>
+ <p class="italic text-right text-xs mt-1">Ci-après dénommé(e) « le Salarié », d'autre part.</p>
+ </div>
+ </div>
+
+ <p class="font-bold mb-4 text-center uppercase text-xs tracking-wider">IL A ÉTÉ CONVENU ET ARRÊTÉ CE QUI SUIT :</p>
+
+ <!-- Articles -->
+ <div class="space-y-4 text-justify">
+ 
+<!-- Article 1 -->
+ <div class="avoid-break">
+ <h3 class="font-bold text-sm uppercase border-b border-slate-300 pb-0.5 mb-1.5">Article 1 – Engagement et Nature du contrat</h3>
+ <p id="prevArt1">
+ L'Employeur engage le Salarié à compter du <strong id="prevStartDate">[Date d'embauche]</strong>, sous réserve des résultats de la visite d'information et de prévention, dans le cadre d'un contrat de travail à durée indéterminée.
+ </p>
+ </div>
+
+ <!-- Article 2 -->
+ <div class="avoid-break">
+ <h3 class="font-bold text-sm uppercase border-b border-slate-300 pb-0.5 mb-1.5">Article 2 – Fonctions et Classification</h3>
+ <p>
+ Le Salarié est engagé en qualité de <strong id="prevJobTitle">[Titre du poste]</strong>, statut / classification : <strong id="prevJobClassification">[Classification]</strong>.
+ </p>
+ <p class="mt-1">
+ Dans le cadre de ses fonctions, le Salarié s'engage à exécuter avec soin et diligence les missions qui lui sont confiées par la direction et à respecter les règles de sécurité, la réglementation sociale européenne et le code de la route applicables au secteur du transport.
+ </p>
+ </div>
+
+ <!-- Article 3 -->
+ <div class="avoid-break">
+ <h3 class="font-bold text-sm uppercase border-b border-slate-300 pb-0.5 mb-1.5">Article 3 – Période d'essai</h3>
+ <p id="prevArt3">
+ Le présent contrat ne deviendra définitif qu'à l'issue d'une période d'essai de <strong id="prevProbation">2 mois</strong>. Durant cette période, chacune des parties pourra rompre le contrat à tout moment, sous réserve de respecter les délais de prévenance légaux prévus aux articles L.1221-25 et L.1221-26 du Code du travail.
+ </p>
+ </div>
+
+ <!-- Article 4 -->
+ <div class="avoid-break">
+ <h3 class="font-bold text-sm uppercase border-b border-slate-300 pb-0.5 mb-1.5">Article 4 – Lieu de travail</h3>
+ <p>
+ Le Salarié exercera ses fonctions au sein de l'établissement situé à : <strong id="prevWorkLocation">[Lieu de travail]</strong>. Compte tenu de la nature de l'activité de transport routier, le Salarié pourra être amené à effectuer des déplacements réguliers sur l'ensemble du territoire national.
+ </p>
+ </div>
+
+ <!-- Article 5 -->
+ <div class="avoid-break">
+ <h3 class="font-bold text-sm uppercase border-b border-slate-300 pb-0.5 mb-1.5">Article 5 – Durée du travail</h3>
+ <p>
+ La durée du travail du Salarié est fixée à <strong id="prevWeeklyHours">35</strong> heures par semaine, soit une durée mensuelle moyenne de <strong id="prevMonthlyHours">151,67</strong> heures.
+ </p>
+ <p class="mt-1">
+ Les horaires de travail seront communiqués au Salarié selon le planning établi par l'Employeur en fonction des impératifs d'exploitation. Le Salarié pourra être amené à effectuer des heures supplémentaires à la demande de la direction, rémunérées conformément aux dispositions légales et conventionnelles en vigueur.
+ </p>
+ </div>
+
+ <!-- Article 6 -->
+ <div class="avoid-break">
+ <h3 class="font-bold text-sm uppercase border-b border-slate-300 pb-0.5 mb-1.5">Article 6 – Rémunération</h3>
+ <p>
+ En contrepartie de son travail, le Salarié percevra une rémunération brute mensuelle de <strong id="prevMonthlySalary">[Montant] €</strong> pour l'horaire mensuel convenu de <span id="prevMonthlyHours2">151,67</span> heures.
+ </p>
+ <p id="prevBonuses" class="mt-1 hidden"></p>
+ </div>
+
+ <!-- Article 7 (Convention collective, CARCEPT Prévoyance/Retraite) -->
+ <div class="avoid-break">
+ <h3 class="font-bold text-sm uppercase border-b border-slate-300 pb-0.5 mb-1.5">Article 7 – Convention collective et Régime de protection sociale (CARCEPT)</h3>
+ <p>
+ Le présent contrat est régi par les dispositions de la <strong id="prevCollectiveAgreement">Convention collective nationale des transports routiers et activités auxiliaires du transport</strong>. 
+ </p>
+ <p class="mt-1">
+ Conformément aux accords applicables à la profession, l'entreprise est affiliée au groupe <strong>CARCEPT</strong> (ou institutions assimilées de la klésia/prévoyance du transport) pour la gestion des régimes de retraite complémentaire et de prévoyance (garanties décès, incapacité, invalidité). Le Salarié est obligatoirement affilié à ces régimes dès son embauche, sa cotisation salariale correspondante étant prélevée directement sur son bulletin de paie.
+ </p>
+ </div>
+
+ <!-- Article 8 (Obligations, DSN & RGPD) -->
+ <div class="avoid-break">
+ <h3 class="font-bold text-sm uppercase border-b border-slate-300 pb-0.5 mb-1.5">Article 8 – Obligations professionnelles, DSN et Données personnelles</h3>
+ <p>
+ Le Salarié s'engage à observer le règlement intérieur de l'entreprise, à prendre soin du véhicule et du matériel qui lui sont confiés, et à signaler sans délai toute suspension ou retrait de son permis de conduire.
+ </p>
+ <p class="mt-1">
+ <strong>Déclaration Sociale Nominative (DSN) :</strong> Conformément aux articles R.133-13 et suivants du Code de la sécurité sociale, les données relatives à la paie et à l'activité du Salarié font l'objet d'une transmission mensuelle dématérialisée obligatoire (DSN) auprès des organismes sociaux de protection sociale et de l'administration.
+ </p>
+ <p class="mt-1">
+ <strong>Données personnelles (RGPD) :</strong> Les informations recueillies sur le Salarié font l'objet d'un traitement informatique destiné à la gestion administrative du personnel, à l'établissement des bulletins de paie et à la gestion de la sécurité sociale. Ce traitement est fondé sur l'exécution du contrat de travail et les obligations légales de l'Employeur. Conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi « Informatique et Libertés », le Salarié dispose d'un droit d'accès, de rectification et d'opposition aux données le concernant auprès de la direction de l'entreprise.
+ </p>
+ </div>
+
+ <!-- Article 9 (Conditional: Foreigner Residence Permit Clause) -->
+ <div id="prevArt9Container" class="hidden avoid-break">
+ <h3 class="font-bold text-sm uppercase border-b border-slate-300 pb-0.5 mb-1.5">Article 9 – Validité du titre de séjour et Autorisation de travail</h3>
+ <p>
+ L'engagement du Salarié est expressément subordonné à la détention et au maintien de la validité de son titre de séjour l'autorisant à travailler sur le territoire français. Le Salarié s'engage à effectuer en temps utile toutes les démarches nécessaires au renouvellement de son autorisation de travail et à en justifier auprès de l'Employeur avant son expiration. À défaut de présentation d'un titre de séjour valide autorisant l'exercice d'une activité salariée, l'Employeur sera contraint de procéder à la rupture du contrat de travail (licenciement) conformément aux dispositions de l'article L.8251-1 du Code du travail.
+ </p>
+ </div>
+
+ </div>
+
+ <!-- Signatures -->
+ <div class="mt-10 pt-4 avoid-break">
+ <p class="mb-6">
+ Fait en deux exemplaires originaux à <strong id="prevSignCity">[Ville]</strong>, le <strong id="prevSignDate">[Date]</strong>.
+ </p>
+ <div class="grid grid-cols-2 gap-8">
+ <div class="border border-slate-300 p-4 h-36 flex flex-col justify-between">
+ <div>
+ <p class="font-bold text-xs uppercase">Pour l'Employeur</p>
+ <p id="prevSignEmpRep" class="text-xs text-slate-600 mt-0.5">[Représentant]</p>
+ </div>
+ <p class="text-[10px] italic text-slate-400">Signature et cachet de l'entreprise</p>
+ </div>
+ <div class="border border-slate-300 p-4 h-36 flex flex-col justify-between">
+ <div>
+ <p class="font-bold text-xs uppercase">Le Salarié</p>
+ <p class="text-[11px] italic text-slate-600 mt-0.5">Mention manuscrite « Lu et approuvé »</p>
+ </div>
+ <p class="text-[10px] italic text-slate-400">Signature du salarié</p>
+ </div>
+ </div>
+ </div>
+
+ </div>
+ </section>
+
+ </main>
+
+ <script>
+ // --- AUTOMATIC SIRET FETCH (Annuaire des Entreprises / Pappers API) ---
+ async function fetchCompanyBySiret() {
+ const siretInput = document.getElementById('empSiret');
+ const statusEl = document.getElementById('siretStatus');
+ const cleanSiret = siretInput.value.replace(/\s+/g, '').trim();
+
+ if (cleanSiret.length !== 14) {
+ statusEl.textContent = "❌ Le numéro SIRET doit comporter exactement 14 chiffres.";
+ statusEl.className = "text-[11px] text-red-600 font-semibold";
+ return;
+ }
+
+ statusEl.textContent = "⏳ Recherche des informations de l'entreprise en cours...";
+ statusEl.className = "text-[11px] text-blue-600 font-semibold";
+
+ try {
+ const response = await fetch(`https://recherche-entreprises.api.gouv.fr/search?q=${cleanSiret}`);
+ const data = await response.json();
+
+ if (data && data.results && data.results.length > 0) {
+ const comp = data.results[0];
+ 
+ // Remplissage automatique des champs employeur
+ document.getElementById('empName').value = comp.nom_raison_sociale || comp.nom_complet || '';
+ document.getElementById('empLegalForm').value = comp.libelle_forme_juridique || '';
+ 
+ // Récupération de l'adresse du siège ou de l'établissement
+ if (comp.adresse) {
+ document.getElementById('empAddress').value = comp.adresse;
+ } else if (comp.siege) {
+ document.getElementById('empAddress').value = `${comp.siege.adresse || ''}, ${comp.siege.code_postal || ''} ${comp.siege.libelle_commune || ''}`.trim();
+ }
+
+ // Tentative de récupération du représentant / dirigeant si disponible
+ if (comp.dirigeants && comp.dirigeants.length > 0) {
+ const dir = comp.dirigeants[0];
+ const dirName = `${dir.nom || ''} ${dir.prenoms || ''}`.trim();
+ if (dirName) {
+ document.getElementById('empRepName').value = dirName;
+ document.getElementById('empRepRole').value = dir.qualite || 'Président / Gérant';
+ }
+ }
+
+ statusEl.textContent = "✅ Entreprise trouvée et informations importées avec succès !";
+ statusEl.className = "text-[11px] text-emerald-600 font-semibold";
+ updatePreview();
+ } else {
+ statusEl.textContent = "❌ Aucun établissement trouvé pour ce SIRET.";
+ statusEl.className = "text-[11px] text-red-600 font-semibold";
+ }
+ } catch (error) {
+ console.error(error);
+ statusEl.textContent = "❌ Erreur de connexion lors de la recherche SIRET.";
+ statusEl.className = "text-[11px] text-red-600 font-semibold";
+ }
+ }
+
+ // Format date YYYY-MM-DD to DD/MM/YYYY
+ function formatDateFR(dateStr) {
+ if (!dateStr) return null;
+ const parts = dateStr.split('-');
+ if (parts.length !== 3) return dateStr;
+ return `${parts[2]}/${parts[1]}/${parts[0]}`;
+ }
+
+ // Format currency
+ function formatMoney(val) {
+ const num = parseFloat(val);
+ if (isNaN(num)) return null;
+ return num.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+ }
+
+ // Sync monthly hours when weekly hours change
+ function syncMonthlyHours() {
+ const weekly = parseFloat(document.getElementById('weeklyHours').value);
+ if (!isNaN(weekly) && weekly > 0) {
+ const monthly = (weekly * 52 / 12).toFixed(2);
+ document.getElementById('monthlyHours').value = monthly;
+ }
+ updatePreview();
+ }
+
+ // Toggle CDI / CDD fields
+ function toggleContractType() {
+ const type = document.querySelector('input[name="contractType"]:checked').value;
+ const cddFields = document.getElementById('cddFields');
+ if (type === 'CDD') {
+ cddFields.classList.remove('hidden');
+ } else {
+ cddFields.classList.add('hidden');
+ }
+ updatePreview();
+ }
+
+ // Toggle Foreigner fields
+ function toggleForeigner() {
+ const isForeigner = document.getElementById('isForeigner').checked;
+ const foreignerFields = document.getElementById('foreignerFields');
+ if (isForeigner) {
+ foreignerFields.classList.remove('hidden');
+ } else {
+ foreignerFields.classList.add('hidden');
+ }
+ updatePreview();
+ }
+
+ // Mobile tabs
+ function switchTab(tab) {
+ const formPanel = document.getElementById('formPanel');
+ const previewPanel = document.getElementById('previewPanel');
+ const btnForm = document.getElementById('btnTabForm');
+ const btnPreview = document.getElementById('btnTabPreview');
+
+ if (tab === 'form') {
+ formPanel.classList.remove('hidden');
+ previewPanel.classList.add('hidden');
+ btnForm.classList.add('bg-blue-600', 'text-white');
+ btnForm.classList.remove('text-slate-300');
+ btnPreview.classList.remove('bg-blue-600', 'text-white');
+ btnPreview.classList.add('text-slate-300');
+ } else {
+ formPanel.classList.add('hidden');
+ previewPanel.classList.remove('hidden');
+ previewPanel.classList.add('block');
+ btnPreview.classList.add('bg-blue-600', 'text-white');
+ btnPreview.classList.remove('text-slate-300');
+ btnForm.classList.remove('bg-blue-600', 'text-white');
+ btnForm.classList.add('text-slate-300');
+ }
+ }
+
+ // Update Live Preview
+ function updatePreview() {
+ const val = (id) => document.getElementById(id).value.trim();
+
+ // Contract type
+ const contractType = document.querySelector('input[name="contractType"]:checked').value;
+ const agreement = val('collectiveAgreement') || 'Convention collective nationale des transports routiers et activités auxiliaires du transport';
+ 
+document.getElementById('prevTitle').textContent = contractType === 'CDI' 
+? 'CONTRAT DE TRAVAIL À DURÉE INDÉTERMINÉE' 
+: 'CONTRAT DE TRAVAIL À DURÉE DÉTERMINÉE';
+ 
+document.getElementById('prevSubtitle').textContent = `Soumis aux dispositions du Code du travail et de la ${agreement}`;
+ document.getElementById('prevCollectiveAgreement').textContent = agreement;
+
+ // Employer
+ document.getElementById('prevEmpName').textContent = val('empName') || '[Raison sociale]';
+ document.getElementById('prevEmpLegalForm').textContent = val('empLegalForm') || '[Forme juridique]';
+ document.getElementById('prevEmpSiret').textContent = val('empSiret') || '[SIRET]';
+ document.getElementById('prevEmpAddress').textContent = val('empAddress') || '[Adresse siège social]';
+ document.getElementById('prevEmpRepName').textContent = val('empRepName') || '[Représentant]';
+ document.getElementById('prevSignEmpRep').textContent = val('empRepName') || '[Représentant]';
+ document.getElementById('prevEmpRepRole').textContent = val('empRepRole') || '[Qualité]';
+ document.getElementById('prevEmpUrssaf').textContent = val('empUrssaf') || '[Organisme URSSAF]';
+
+ // Employee
+ document.getElementById('prevSalCivility').textContent = val('salCivility');
+ const fullName = `${val('salFirstName')} ${val('salLastName').toUpperCase()}`.trim();
+ document.getElementById('prevSalFullName').textContent = fullName || '[PRÉNOM NOM]';
+ document.getElementById('prevSalBirthDate').textContent = formatDateFR(val('salBirthDate')) || '[Date]';
+ document.getElementById('prevSalBirthPlace').textContent = val('salBirthPlace') || '[Lieu]';
+ document.getElementById('prevSalNationality').textContent = val('salNationality') || '[Nationalité]';
+ document.getElementById('prevSalAddress').textContent = val('salAddress') || '[Adresse du salarié]';
+ document.getElementById('prevSalSsn').textContent = val('salSsn') || '[N° Sécurité Sociale]';
+
+ // Foreigner
+ const isForeigner = document.getElementById('isForeigner').checked;
+ const prevForeignerInfo = document.getElementById('prevForeignerInfo');
+ const prevArt9Container = document.getElementById('prevArt9Container');
+ if (isForeigner) {
+ prevForeignerInfo.classList.remove('hidden');
+ prevArt9Container.classList.remove('hidden');
+ document.getElementById('prevPermitType').textContent = val('permitType') || 'Titre de séjour';
+ document.getElementById('prevPermitNumber').textContent = val('permitNumber') || '[Numéro]';
+ document.getElementById('prevPermitExpiry').textContent = formatDateFR(val('permitExpiry')) || '[Date]';
+ } else {
+ prevForeignerInfo.classList.add('hidden');
+ prevArt9Container.classList.add('hidden');
+ }
+
+ // Article 1 (CDI vs CDD)
+ const startDateStr = formatDateFR(val('startDate')) || "[Date d'embauche]";
+ if (contractType === 'CDI') {
+ document.getElementById('prevArt1').innerHTML = `L'Employeur engage le Salarié à compter du <strong>${startDateStr}</strong>, sous réserve des résultats de la visite d'information et de prévention, dans le cadre d'un contrat de travail à durée indéterminée.`;
+ } else {
+ const motif = val('cddMotif');
+ const endDateStr = formatDateFR(val('cddEndDate')) || '[Date de fin]';
+ const minDur = val('cddMinDuration');
+ let cddText = `L'Employeur engage le Salarié à compter du <strong>${startDateStr}</strong> jusqu'au <strong>${endDateStr}</strong>, sous réserve des résultats de la visite d'information et de prévention, dans le cadre d'un contrat de travail à durée déterminée conclu pour le motif suivant : <strong>${motif}</strong>.`;
+ if (minDur) {
+ cddText += ` Ce contrat est conclu pour une durée minimale de <strong>${minDur}</strong>.`;
+ }
+ document.getElementById('prevArt1').innerHTML = cddText;
+ }
+
+ // Article 2: Job & Classification
+ document.getElementById('prevJobTitle').textContent = val('jobTitle') || '[Titre du poste]';
+ document.getElementById('prevJobClassification').textContent = val('jobClassification') || '[Classification]';
+
+ // Article 3: Probation
+ const probation = val('probationPeriod');
+ if (!probation || probation.toLowerCase() === 'aucune' || probation === '0') {
+ document.getElementById('prevArt3').innerHTML = `D'un commun accord entre les parties, le présent contrat est conclu <strong>sans période d'essai</strong>.`;
+ } else {
+ document.getElementById('prevArt3').innerHTML = `Le présent contrat ne deviendra définitif qu'à l'issue d'une période d'essai de <strong>${probation}</strong>. Durant cette période, chacune des parties pourra rompre le contrat à tout moment, sous réserve de respecter les délais de prévenance légaux prévus aux articles L.1221-25 et L.1221-26 du Code du travail.`;
+ }
+
+ // Article 4: Location
+ document.getElementById('prevWorkLocation').textContent = val('workLocation') || '[Lieu de travail]';
+
+ // Article 5: Hours
+ const weeklyH = val('weeklyHours') || '35';
+ const monthlyH = val('monthlyHours') || '151,67';
+ document.getElementById('prevWeeklyHours').textContent = weeklyH.replace('.', ',');
+ document.getElementById('prevMonthlyHours').textContent = monthlyH.replace('.', ',');
+ document.getElementById('prevMonthlyHours2').textContent = monthlyH.replace('.', ',');
+
+ // Article 6: Salary & Indicators
+ const salaryRaw = parseFloat(val('monthlySalary'));
+ const mHoursNum = parseFloat(monthlyH);
+ const indicatorsEl = document.getElementById('salaryIndicators');
+ if (!isNaN(salaryRaw) && salaryRaw > 0) {
+ const formattedSalary = formatMoney(salaryRaw);
+ document.getElementById('prevMonthlySalary').textContent = `${formattedSalary} €`;
+ const annual = formatMoney(salaryRaw * 12);
+ const hourly = (!isNaN(mHoursNum) && mHoursNum > 0) ? formatMoney(salaryRaw / mHoursNum) : '—';
+ indicatorsEl.textContent = `${hourly} €/h | ${annual} €/an`;
+ } else {
+ document.getElementById('prevMonthlySalary').textContent = '[Montant] €';
+ indicatorsEl.textContent = '— €/h | — €/an';
+ }
+
+ const bonuses = val('bonuses');
+ const bonusesEl = document.getElementById('prevBonuses');
+ if (bonuses) {
+ bonusesEl.textContent = `À cette rémunération s'ajoutent : ${bonuses}.`;
+ bonusesEl.classList.remove('hidden');
+ } else {
+ bonusesEl.classList.add('hidden');
+ }
+
+ // Signature
+ document.getElementById('prevSignCity').textContent = val('signCity') || '[Ville]';
+ document.getElementById('prevSignDate').textContent = formatDateFR(val('signDate')) || '[Date]';
+ }
+
+ // Fill with realistic example
+ function fillExample() {
+ document.querySelector('input[name="contractType"][value="CDI"]').checked = true;
+ toggleContractType();
+
+ document.getElementById('empSiret').value = '84291034500021';
+ document.getElementById('empName').value = 'TRANSPORTS RHÔNE-ALPES LOGISTIQUE';
+ document.getElementById('empLegalForm').value = 'SAS';
+ document.getElementById('empAddress').value = '14 Rue des Transporteurs, 69800 Saint-Priest';
+ document.getElementById('empRepName').value = 'M. Marc LEROY';
+ document.getElementById('empRepRole').value = 'Directeur Général';
+ document.getElementById('empUrssaf').value = 'URSSAF Rhône-Alpes';
+
+ document.getElementById('salCivility').value = 'Monsieur';
+ document.getElementById('salLastName').value = 'BENALI';
+ document.getElementById('salFirstName').value = 'Karim';
+ document.getElementById('salBirthDate').value = '1992-04-18';
+ document.getElementById('salBirthPlace').value = 'Casablanca (Maroc)';
+ document.getElementById('salNationality').value = 'Marocaine';
+ document.getElementById('salAddress').value = '28 Boulevard des États-Unis, 69008 Lyon';
+ document.getElementById('salSsn').value = '1 92 04 99 350 142 55';
+
+ document.getElementById('isForeigner').checked = true;
+ toggleForeigner();
+ document.getElementById('permitType').value = 'Carte de séjour pluriannuelle - Salarié';
+ document.getElementById('permitNumber').value = '9904827163';
+ document.getElementById('permitExpiry').value = '2028-10-15';
+
+ document.getElementById('jobTitle').value = 'Conducteur Routier Grand Routier (SPL)';
+ document.getElementById('jobClassification').value = 'Ouvrier - Groupe 7 - Coefficient 150M';
+ document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
+ document.getElementById('probationPeriod').value = '2 mois';
+ document.getElementById('workLocation').value = 'Agence de Saint-Priest (69) et déplacements nationaux';
+ document.getElementById('collectiveAgreement').value = 'Convention collective nationale des transports routiers et activités auxiliaires du transport';
+ document.getElementById('weeklyHours').value = '39';
+ document.getElementById('monthlyHours').value = '169.00';
+
+ document.getElementById('monthlySalary').value = '2650.00';
+ document.getElementById('bonuses').value = 'Indemnités de frais de déplacement (repas et découchers) selon le barème de la convention collective du transport routier';
+
+ document.getElementById('signCity').value = 'Saint-Priest';
+ document.getElementById('signDate').value = new Date().toISOString().split('T')[0];
+
+ updatePreview();
+ }
+
+ // Reset form
+ function resetForm() {
+ const inputs = document.querySelectorAll('#formPanel input[type="text"], #formPanel input[type="date"], #formPanel input[type="number"]');
+ inputs.forEach(input => input.value = '');
+ document.querySelector('input[name="contractType"][value="CDI"]').checked = true;
+ document.getElementById('isForeigner').checked = false;
+ document.getElementById('collectiveAgreement').value = 'Convention collective nationale des transports routiers et activités auxiliaires du transport';
+ document.getElementById('weeklyHours').value = '35';
+ document.getElementById('monthlyHours').value = '151.67';
+ document.getElementById('probationPeriod').value = '2 mois';
+ document.getElementById('siretStatus').textContent = "Renseignez les 14 chiffres pour importer les données officielles (Pappers / Annuaire des Entreprises).";
+ document.getElementById('siretStatus').className = "text-[11px] text-slate-500 italic";
+ toggleContractType();
+ toggleForeigner();
+ updatePreview();
+ }
+
+ // Download PDF
+ function downloadPDF() {
+ const element = document.getElementById('contractDocument');
+ const btn = document.getElementById('btnDownload');
+ const originalHTML = btn.innerHTML;
+ 
+btn.innerHTML = '<span>Génération...</span>';
+ btn.disabled = true;
+
+ const lastName = document.getElementById('salLastName').value.trim() || 'Salarie';
+ const contractType = document.querySelector('input[name="contractType"]:checked').value;
+ const filename = `Contrat_${contractType}_${lastName.replace(/\s+/g, '_')}.pdf`;
+
+ const opt = {
+ margin: 0,
+ filename: filename,
+ image: { type: 'jpeg', quality: 0.98 },
+ html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+ jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+ pagebreak: { mode: ['css', 'legacy'], avoid: '.avoid-break' }
+ };
+
+ html2pdf().set(opt).from(element).save().then(() => {
+ btn.innerHTML = originalHTML;
+ btn.disabled = false;
+ }).catch(err => {
+ console.error(err);
+ btn.innerHTML = originalHTML;
+ btn.disabled = false;
+ alert('Une erreur est survenue lors de la création du PDF.');
+ });
+ }
+
+ // Initialize today's date
+ window.addEventListener('DOMContentLoaded', () => {
+ const today = new Date().toISOString().split('T')[0];
+ document.getElementById('startDate').value = today;
+ document.getElementById('signDate').value = today;
+ updatePreview();
+ });
+ </script>
+</body>
+</html>
